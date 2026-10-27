@@ -1,0 +1,1426 @@
+# OpenSearch Dashboards Dev Tools requests. Run one request at a time.
+# Read README.md and expected-results.md before sending requests.
+# No headers or credentials belong in this file. Dev Tools uses its existing connection.
+
+### 01 - Require version.number == 3.9.0
+GET /
+
+### 02 - Require 404. Stop if index exists or this check is unauthorized.
+HEAD /retry-job-events
+
+### 03 - Create only after prerequisite checks
+PUT /retry-job-events
+{
+  "mappings": {
+    "dynamic": "strict",
+    "properties": {
+      "batch_id": {
+        "type": "keyword"
+      },
+      "job_id": {
+        "type": "keyword"
+      },
+      "event_id": {
+        "type": "keyword"
+      },
+      "state": {
+        "type": "keyword"
+      },
+      "attempt": {
+        "type": "integer",
+        "coerce": false
+      },
+      "event_seq": {
+        "type": "long",
+        "coerce": false
+      },
+      "event_time": {
+        "type": "date",
+        "format": "strict_date_time"
+      },
+      "ingested_at": {
+        "type": "date",
+        "format": "strict_date_time"
+      }
+    }
+  }
+}
+
+### 04 - Initial 32 creates. Require errors:false and every item status:201.
+POST /retry-job-events/_bulk?refresh=wait_for
+{"create":{"_id":"J01-01"}}
+{"batch_id":"exports-20261010","job_id":"J01","event_id":"J01-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J01-02"}}
+{"batch_id":"exports-20261010","job_id":"J01","event_id":"J01-02","state":"failed","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:01:00.000+04:00","ingested_at":"2026-10-10T10:01:01.000+04:00"}
+{"create":{"_id":"J01-03"}}
+{"batch_id":"exports-20261010","job_id":"J01","event_id":"J01-03","state":"running","attempt":2,"event_seq":3,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J01-04"}}
+{"batch_id":"exports-20261010","job_id":"J01","event_id":"J01-04","state":"succeeded","attempt":2,"event_seq":4,"event_time":"2026-10-10T10:03:00.000+04:00","ingested_at":"2026-10-10T10:03:01.000+04:00"}
+{"create":{"_id":"J02-01"}}
+{"batch_id":"exports-20261010","job_id":"J02","event_id":"J02-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J02-03"}}
+{"batch_id":"exports-20261010","job_id":"J02","event_id":"J02-03","state":"running","attempt":2,"event_seq":3,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J02-04"}}
+{"batch_id":"exports-20261010","job_id":"J02","event_id":"J02-04","state":"succeeded","attempt":2,"event_seq":4,"event_time":"2026-10-10T10:03:00.000+04:00","ingested_at":"2026-10-10T10:03:01.000+04:00"}
+{"create":{"_id":"J02-02"}}
+{"batch_id":"exports-20261010","job_id":"J02","event_id":"J02-02","state":"failed","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:01:00.000+04:00","ingested_at":"2026-10-10T10:08:00.000+04:00"}
+{"create":{"_id":"J03-01"}}
+{"batch_id":"exports-20261010","job_id":"J03","event_id":"J03-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J03-02"}}
+{"batch_id":"exports-20261010","job_id":"J03","event_id":"J03-02","state":"failed","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:01:00.000+04:00","ingested_at":"2026-10-10T10:01:01.000+04:00"}
+{"create":{"_id":"J03-04"}}
+{"batch_id":"exports-20261010","job_id":"J03","event_id":"J03-04","state":"succeeded","attempt":2,"event_seq":4,"event_time":"2026-10-10T10:03:00.000+04:00","ingested_at":"2026-10-10T10:03:02.000+04:00"}
+{"create":{"_id":"J03-03"}}
+{"batch_id":"exports-20261010","job_id":"J03","event_id":"J03-03","state":"running","attempt":2,"event_seq":3,"event_time":"2026-10-10T10:03:00.000+04:00","ingested_at":"2026-10-10T10:03:01.000+04:00"}
+{"create":{"_id":"J04-01"}}
+{"batch_id":"exports-20261010","job_id":"J04","event_id":"J04-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J04-02"}}
+{"batch_id":"exports-20261010","job_id":"J04","event_id":"J04-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J05-01"}}
+{"batch_id":"exports-20261010","job_id":"J05","event_id":"J05-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J05-02"}}
+{"batch_id":"exports-20261010","job_id":"J05","event_id":"J05-02","state":"failed","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:01:00.000+04:00","ingested_at":"2026-10-10T10:01:01.000+04:00"}
+{"create":{"_id":"J05-03"}}
+{"batch_id":"exports-20261010","job_id":"J05","event_id":"J05-03","state":"running","attempt":2,"event_seq":3,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J05-04"}}
+{"batch_id":"exports-20261010","job_id":"J05","event_id":"J05-04","state":"failed","attempt":2,"event_seq":4,"event_time":"2026-10-10T10:04:00.000+04:00","ingested_at":"2026-10-10T10:04:01.000+04:00"}
+{"create":{"_id":"J06-01"}}
+{"batch_id":"exports-20261010","job_id":"J06","event_id":"J06-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J06-02"}}
+{"batch_id":"exports-20261010","job_id":"J06","event_id":"J06-02","state":"failed","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:01:00.000+04:00","ingested_at":"2026-10-10T10:01:01.000+04:00"}
+{"create":{"_id":"J06-03"}}
+{"batch_id":"exports-20261010","job_id":"J06","event_id":"J06-03","state":"running","attempt":2,"event_seq":3,"event_time":"2026-10-10T10:04:00.000+04:00","ingested_at":"2026-10-10T10:04:01.000+04:00"}
+{"create":{"_id":"J07-01"}}
+{"batch_id":"exports-20261010","job_id":"J07","event_id":"J07-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J08-01"}}
+{"batch_id":"exports-20261010","job_id":"J08","event_id":"J08-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J08-02"}}
+{"batch_id":"exports-20261010","job_id":"J08","event_id":"J08-02","state":"failed","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:04:00.000+04:00","ingested_at":"2026-10-10T10:04:01.000+04:00"}
+{"create":{"_id":"J09-01"}}
+{"batch_id":"exports-20261010","job_id":"J09","event_id":"J09-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J09-02"}}
+{"batch_id":"exports-20261010","job_id":"J09","event_id":"J09-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J10-01"}}
+{"batch_id":"exports-20261010","job_id":"J10","event_id":"J10-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J10-02"}}
+{"batch_id":"exports-20261010","job_id":"J10","event_id":"J10-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J11-01"}}
+{"batch_id":"exports-20261010","job_id":"J11","event_id":"J11-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J11-02"}}
+{"batch_id":"exports-20261010","job_id":"J11","event_id":"J11-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+{"create":{"_id":"J12-01"}}
+{"batch_id":"exports-20261010","job_id":"J12","event_id":"J12-01","state":"running","attempt":1,"event_seq":1,"event_time":"2026-10-10T10:00:00.000+04:00","ingested_at":"2026-10-10T10:00:01.000+04:00"}
+{"create":{"_id":"J12-02"}}
+{"batch_id":"exports-20261010","job_id":"J12","event_id":"J12-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:02:00.000+04:00","ingested_at":"2026-10-10T10:02:01.000+04:00"}
+
+### 05 - Expected count 32
+GET /retry-job-events/_count
+
+### 06 - Wrong A: failure records, not latest failed jobs
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        },
+        {
+          "term": {
+            "state": "failed"
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 12,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+
+### 07 - Correct C0 before delayed load; page 1; start without after
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 08 - Correct C0 before delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J04"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 09 - Correct C0 before delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J08"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 10 - Correct C0 before delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J12"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 11 - Wrong B C0 before delayed load; page 1; start without after
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "ingested_at": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 12 - Wrong B C0 before delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J04"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "ingested_at": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 13 - Wrong B C0 before delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J08"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "ingested_at": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 14 - Wrong B C0 before delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J12"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "ingested_at": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 15 - Delayed completion, only after BOTH preceding traversals finish
+POST /retry-job-events/_bulk?refresh=wait_for
+{"create":{"_id":"J07-02"}}
+{"batch_id":"exports-20261010","job_id":"J07","event_id":"J07-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:04:00.000+04:00","ingested_at":"2026-10-10T10:12:00.000+04:00"}
+
+### 16 - Expected count 33
+GET /retry-job-events/_count
+
+### 17 - Correct C0 after delayed load; page 1; restart without after
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 18 - Correct C0 after delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J04"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 19 - Correct C0 after delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J08"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 20 - Correct C0 after delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:10:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J12"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 21 - Correct C1 after delayed load; page 1; restart without after
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:15:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ]
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 22 - Correct C1 after delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:15:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J04"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 23 - Correct C1 after delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:15:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J08"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 24 - Correct C1 after delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
+POST /retry-job-events/_search
+{
+  "size": 0,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:15:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "aggs": {
+    "jobs": {
+      "composite": {
+        "size": 4,
+        "sources": [
+          {
+            "job_id": {
+              "terms": {
+                "field": "job_id",
+                "order": "asc"
+              }
+            }
+          }
+        ],
+        "after": {
+          "job_id": "J12"
+        }
+      },
+      "aggs": {
+        "latest": {
+          "top_hits": {
+            "size": 1,
+            "sort": [
+              {
+                "event_seq": "desc"
+              },
+              {
+                "event_id": "asc"
+              }
+            ],
+            "_source": [
+              "job_id",
+              "event_id",
+              "state",
+              "attempt",
+              "event_seq",
+              "event_time",
+              "ingested_at"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
+
+### 25 - Full final inventory, compare every _source with the fixed fixture
+POST /retry-job-events/_search
+{
+  "size": 33,
+  "track_total_hits": true,
+  "query": {
+    "bool": {
+      "filter": [
+        {
+          "term": {
+            "batch_id": "exports-20261010"
+          }
+        },
+        {
+          "range": {
+            "event_time": {
+              "lte": "2026-10-10T10:05:00.000+04:00"
+            }
+          }
+        },
+        {
+          "range": {
+            "ingested_at": {
+              "lte": "2026-10-10T10:15:00.000+04:00"
+            }
+          }
+        }
+      ]
+    }
+  },
+  "sort": [
+    {
+      "job_id": "asc"
+    },
+    {
+      "event_seq": "asc"
+    },
+    {
+      "event_id": "asc"
+    }
+  ]
+}

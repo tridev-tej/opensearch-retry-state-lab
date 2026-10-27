@@ -1,0 +1,2 @@
+{"create":{"_id":"J07-02"}}
+{"batch_id":"exports-20261010","job_id":"J07","event_id":"J07-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:04:00.000+04:00","ingested_at":"2026-10-10T10:12:00.000+04:00"}
