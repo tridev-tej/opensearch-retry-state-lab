@@ -170,7 +170,7 @@ POST /retry-job-events/_search
   }
 }
 
-### 07 - Correct C0 before delayed load; page 1; start without after
+### 07 - Sequence C0 first page; run before AND after delayed load; start without after
 POST /retry-job-events/_search
 {
   "size": 0,
@@ -243,7 +243,7 @@ POST /retry-job-events/_search
   }
 }
 
-### 08 - Correct C0 before delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+### 08 - Sequence C0 continuation; reuse while response supplies after_key; bind {{AFTER_KEY}}
 POST /retry-job-events/_search
 {
   "size": 0,
@@ -287,9 +287,7 @@ POST /retry-job-events/_search
             }
           }
         ],
-        "after": {
-          "job_id": "J04"
-        }
+        "after": {{AFTER_KEY}}
       },
       "aggs": {
         "latest": {
@@ -319,159 +317,7 @@ POST /retry-job-events/_search
   }
 }
 
-### 09 - Correct C0 before delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J08"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 10 - Correct C0 before delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J12"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 11 - Wrong B C0 before delayed load; page 1; start without after
+### 09 - Receipt C0 first page; run before delayed load; start without after
 POST /retry-job-events/_search
 {
   "size": 0,
@@ -544,7 +390,7 @@ POST /retry-job-events/_search
   }
 }
 
-### 12 - Wrong B C0 before delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+### 10 - Receipt C0 continuation; reuse while response supplies after_key; bind {{AFTER_KEY}}
 POST /retry-job-events/_search
 {
   "size": 0,
@@ -588,9 +434,7 @@ POST /retry-job-events/_search
             }
           }
         ],
-        "after": {
-          "job_id": "J04"
-        }
+        "after": {{AFTER_KEY}}
       },
       "aggs": {
         "latest": {
@@ -620,468 +464,15 @@ POST /retry-job-events/_search
   }
 }
 
-### 13 - Wrong B C0 before delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J08"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "ingested_at": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 14 - Wrong B C0 before delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J12"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "ingested_at": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 15 - Delayed completion, only after BOTH preceding traversals finish
+### 11 - Delayed completion, only after BOTH initial traversals finish
 POST /retry-job-events/_bulk?refresh=wait_for
 {"create":{"_id":"J07-02"}}
 {"batch_id":"exports-20261010","job_id":"J07","event_id":"J07-02","state":"succeeded","attempt":1,"event_seq":2,"event_time":"2026-10-10T10:04:00.000+04:00","ingested_at":"2026-10-10T10:12:00.000+04:00"}
 
-### 16 - Expected count 33
+### 12 - Expected count 33
 GET /retry-job-events/_count
 
-### 17 - Correct C0 after delayed load; page 1; restart without after
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ]
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 18 - Correct C0 after delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J04"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 19 - Correct C0 after delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J08"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 20 - Correct C0 after delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:10:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J12"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 21 - Correct C1 after delayed load; page 1; restart without after
+### 13 - Sequence C1 first page; run after C0-after traversal; start without after
 POST /retry-job-events/_search
 {
   "size": 0,
@@ -1154,7 +545,7 @@ POST /retry-job-events/_search
   }
 }
 
-### 22 - Correct C1 after delayed load; page 2; execute only if previous actual after_key == {"job_id":"J04"}
+### 14 - Sequence C1 continuation; reuse while response supplies after_key; bind {{AFTER_KEY}}
 POST /retry-job-events/_search
 {
   "size": 0,
@@ -1198,9 +589,7 @@ POST /retry-job-events/_search
             }
           }
         ],
-        "after": {
-          "job_id": "J04"
-        }
+        "after": {{AFTER_KEY}}
       },
       "aggs": {
         "latest": {
@@ -1230,159 +619,7 @@ POST /retry-job-events/_search
   }
 }
 
-### 23 - Correct C1 after delayed load; page 3; execute only if previous actual after_key == {"job_id":"J08"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:15:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J08"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 24 - Correct C1 after delayed load; page 4; execute only if previous actual after_key == {"job_id":"J12"}
-POST /retry-job-events/_search
-{
-  "size": 0,
-  "track_total_hits": true,
-  "query": {
-    "bool": {
-      "filter": [
-        {
-          "term": {
-            "batch_id": "exports-20261010"
-          }
-        },
-        {
-          "range": {
-            "event_time": {
-              "lte": "2026-10-10T10:05:00.000+04:00"
-            }
-          }
-        },
-        {
-          "range": {
-            "ingested_at": {
-              "lte": "2026-10-10T10:15:00.000+04:00"
-            }
-          }
-        }
-      ]
-    }
-  },
-  "aggs": {
-    "jobs": {
-      "composite": {
-        "size": 4,
-        "sources": [
-          {
-            "job_id": {
-              "terms": {
-                "field": "job_id",
-                "order": "asc"
-              }
-            }
-          }
-        ],
-        "after": {
-          "job_id": "J12"
-        }
-      },
-      "aggs": {
-        "latest": {
-          "top_hits": {
-            "size": 1,
-            "sort": [
-              {
-                "event_seq": "desc"
-              },
-              {
-                "event_id": "asc"
-              }
-            ],
-            "_source": [
-              "job_id",
-              "event_id",
-              "state",
-              "attempt",
-              "event_seq",
-              "event_time",
-              "ingested_at"
-            ]
-          }
-        }
-      }
-    }
-  }
-}
-
-### 25 - Full final inventory, compare every _source with the fixed fixture
+### 15 - Full final inventory, compare every _source with the fixed fixture
 POST /retry-job-events/_search
 {
   "size": 33,

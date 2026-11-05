@@ -1,6 +1,6 @@
 # Expected results
 
-These expectations follow from the supplied synthetic fixture. Compare your responses with the checks below.
+These expectations follow from the supplied test fixture. Compare your responses with the checks below.
 
 ## Setup and load expectations
 
@@ -11,10 +11,10 @@ These expectations follow from the supplied synthetic fixture. Compare your resp
 | 03 | Index creation succeeds with `acknowledged: true` and the supplied mapping |
 | 04 | `errors: false`; 32 ordered `create` items, each status 201 and `_id` equal to its fixture `event_id` |
 | 05 | `count: 32`, zero failed shards |
-| 15 | `errors: false`; one `create`, status 201, `_id: J07-02` |
-| 16 | `count: 33`, zero failed shards |
+| 11 | `errors: false`; one `create`, status 201, `_id: J07-02` |
+| 12 | `count: 33`, zero failed shards |
 
-For every search, require `timed_out: false` and `_shards.failed: 0`. With `track_total_hits: true`, require exact `hits.total.relation: "eq"`. The aggregation searches in requests 06-24 have outer `size: 0`, so their ordinary `hits.hits` array is empty. The states used below come from aggregation sub-hits, not the outer array. Shard counts and timing values depend on deployment defaults.
+For every search, require `timed_out: false` and `_shards.failed: 0`. With `track_total_hits: true`, require exact `hits.total.relation: "eq"`. The aggregation searches in requests 06-10 and 13-14 have outer `size: 0`, so their ordinary `hits.hits` array is empty. The states used below come from aggregation sub-hits, not the outer array. Shard counts and timing values depend on deployment defaults.
 
 ## Wrong A: failure-filtered grouping
 
@@ -33,7 +33,7 @@ This is a count of jobs with failure records. Calling all six jobs currently fai
 
 ## Correct reconstruction: complete selected events
 
-Requests 07-10 use application sequence at cutoff C0 before the delayed load. Requests 17-20 repeat C0 after that load. Both are expected to have matching document total 32 and exactly the same selected sources. Requests 21-24 use C1 after the load and match 33 documents. The table covers all populated pages. Each selected hit's `_id` equals its `event_id`.
+Templates 07/08 use application sequence at cutoff C0. Traverse them completely before the delayed load, then restart 07 with empty tallies and no `after` and reuse 08 after that load. Both are expected to have matching document total 32 and exactly the same selected sources. Templates 13/14 use C1 after the load and match 33 documents. The table covers all populated pages. Each selected hit's `_id` equals its `event_id`.
 
 | Page | Job | C0 bucket `doc_count` | C0 selected event | Attempt | Sequence | State | C1 change |
 | ---: | :--- | ---: | :--- | ---: | ---: | :--- | :--- |
@@ -56,26 +56,26 @@ Expected selected-state totals:
 
 | Traversal | Succeeded | Failed | Running | Jobs |
 | :--- | ---: | ---: | ---: | ---: |
-| Correct C0 before delayed load, 07-10 | 8 | 2 | 2 | 12 |
-| Correct C0 after delayed load, 17-20 | 8 | 2 | 2 | 12 |
-| Correct C1 after delayed load, 21-24 | 9 | 2 | 1 | 12 |
+| Correct C0 before delayed load, 07/08 | 8 | 2 | 2 | 12 |
+| Correct C0 after delayed load, restart 07/08 | 8 | 2 | 2 | 12 |
+| Correct C1 after delayed load, 13/14 | 9 | 2 | 1 | 12 |
 
 J05 and J08 are the only latest failed jobs. J06 remains running. At C0, J07 remains running even after J07-02 has been physically loaded because its receipt timestamp exceeds C0.
 
 ## Wrong B: receipt ordering
 
-Requests 11-14 keep all 32 matching snapshots but sort sub-hits by `ingested_at desc, event_id asc`. Their bucket counts and job pages match 07-10. Every selected event is identical to the C0 table except **J02 selects J02-02, attempt 1, sequence 2, state failed**, with receipt timestamp `2026-10-10T10:08:00.000+04:00`. The expected totals are seven succeeded, three failed, and two running. The incorrect failed set is J02, J05, J08.
+Templates 09/10 keep all 32 matching snapshots but sort sub-hits by `ingested_at desc, event_id asc`. Their bucket counts and job pages match 07/08. Every selected event is identical to the C0 table except **J02 selects J02-02, attempt 1, sequence 2, state failed**, with receipt timestamp `2026-10-10T10:08:00.000+04:00`. The expected totals are seven succeeded, three failed, and two running. The incorrect failed set is J02, J05, J08.
 
 ## Pagination and exhaustion
 
-| Page | Expected bucket keys | Prepared `after` in next request, conditional on actual response |
+| Page | Expected bucket keys | Next action |
 | ---: | :--- | :--- |
-| 1 | J01, J02, J03, J04 | `{"job_id":"J04"}` |
-| 2 | J05, J06, J07, J08 | `{"job_id":"J08"}` |
-| 3 | J09, J10, J11, J12 | `{"job_id":"J12"}` |
+| 1 | J01, J02, J03, J04 | If a cursor is returned, bind it into continuation 08, 10, or 14 for the current traversal |
+| 2 | J05, J06, J07, J08 | If a cursor is returned, rebind and reuse the same continuation |
+| 3 | J09, J10, J11, J12 | If a cursor is returned, rebind and reuse the same continuation, even though all 12 jobs have appeared |
 | 4 | Empty `buckets`, when reached using a returned final cursor | Stop |
 
-These are expected bucket pages and example cursor values, not captured `after_key` objects. Always take the continuation object from the actual response. The prepared fourth requests (10, 14, 20, 24) are conditional: execute only if the preceding nonempty page supplies a cursor, using its returned value. If the cursor is absent, the traversal has already ended. Do not require a particular empty-page cursor shape.
+These are expected bucket pages, not cursor values. Always copy the complete actual returned `after_key` object. An empty bucket array or an absent cursor ends traversal; require all 12 jobs with no duplicates at exhaustion. Do not require a particular empty-page cursor shape. A populated page with a cursor always requires continuation. Follow the same rule for all four traversals, with fresh tallies each time.
 
 At page one, the correct traversal has four succeeded and zero failed jobs. After page two, it has four succeeded, two failed, and two running. Page three adds four successes. `hits.total` remains the matching snapshot total on each page; it is not a per-page or distinct-job count.
 
@@ -120,7 +120,7 @@ This is the literal initial fixture projected into a compact table. All dates ar
 
 The single delayed source is J07-02: attempt 1, sequence 2, state `succeeded`, event time `2026-10-10T10:04:00.000+04:00`, receipt time `2026-10-10T10:12:00.000+04:00`.
 
-Request 25 must return 33 ordinary hits with `hits.total: {"value":33,"relation":"eq"}`. Their `_source` objects must equal the 32 initial documents plus the delayed document, sorted by `job_id asc, event_seq asc, event_id asc`. Compare every field, including timestamps and `batch_id`. J02-02 and J03-03 intentionally occur out of sequence in the original bulk body; stored insertion order must not become application order.
+Request 15 must return 33 ordinary hits with `hits.total: {"value":33,"relation":"eq"}`. Their `_source` objects must equal the 32 initial documents plus the delayed document, sorted by `job_id asc, event_seq asc, event_id asc`. Compare every field, including timestamps and `batch_id`. J02-02 and J03-03 intentionally occur out of sequence in the original bulk body; stored insertion order must not become application order.
 
 ## Ordering checks and failure expectations
 
